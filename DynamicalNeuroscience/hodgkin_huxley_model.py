@@ -14,6 +14,8 @@ import numpy as np
 from nernstEquation import nernst_full
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from scipy import signal
+
 
 # constants
 
@@ -78,6 +80,19 @@ def timeconstant(V,gate):
 def gate_diff(V,gate_id,gate_0):
     return (gate_inf(V,gate_id)-gate_0)/timeconstant(V,gate_id) 
 
+# current pulser (assumes same units as time series)
+pulse_mag = 15 #mA
+pulse_period = 10
+pulse_length = 1
+pulse_delay = 5 
+
+# take a time-axis array and generate a PWM-style pulse array.
+# pulses from zero to given magnitude
+def current_pulser(magnitude,period,length,delay,timeseries):
+    frequency = 1/period
+    pwm_array = (signal.square(frequency*2*np.pi*t,duty=length/period)+1)/2*magnitude
+    return np.where(timeseries >= delay, pwm_array, 0)
+
 
 dt = 1/100 #ms
 duration = 40 #ms
@@ -107,7 +122,7 @@ I_L = np.zeros(range)
 # plt.axvline(x=-65,color='r',linestyle='--')
 # plt.show()
 
-V_0 = -65
+V_0 = -65.5
 
 # intial values of iterated variables
 V[0] = V_0
@@ -118,6 +133,7 @@ n[0] = n_0 = gate_inf(V_0,gate_n)
 I_K[0]=gKmax*(n_0**4)*(V[0]-EK)
 I_Na[0]=gNamax*(m_0**3)*h_0*(V[0]-ENa)
 I_L[0]=gL*(V[0]-ECl)
+
 Iapplied = np.zeros(range)
 
 
@@ -146,12 +162,12 @@ for i,time in enumerate(t):
     I_Na[i+1]=gNamax*(m[i+1]**3)*h[i+1]*(V[i+1]-ENa)
     I_L[i+1]=gL*(V[i+1]-ECl)
 
-plt.figure()
-plt.plot(t,V[0:len(V)-1], label="membrane potential")
-plt.xlabel("ms")
-plt.ylabel("mV")
-plt.legend()
-plt.axhline(y=V_0,color='r',linestyle='--')
+# plt.figure()
+# plt.plot(t,V[0:len(V)-1], label="membrane potential")
+# plt.xlabel("ms")
+# plt.ylabel("mV")
+# plt.legend()
+# plt.axhline(y=V_0,color='r',linestyle='--')
 
 fig = make_subplots(rows=2,cols=2)
 fig.add_trace(go.Line(x=t,y=V[0:len(V)-1]),row=1,col=1)
