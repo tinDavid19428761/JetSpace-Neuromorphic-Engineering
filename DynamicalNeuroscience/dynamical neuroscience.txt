@@ -1,0 +1,5 @@
+dynamical neuroscience.txt
+
+folder for programming neuron models using NEURON platform.
+
+catalog equations in function algorithms etcetc
