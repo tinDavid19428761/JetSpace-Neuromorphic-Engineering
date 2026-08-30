@@ -162,6 +162,9 @@ for i,time in enumerate(t):
     I_Na[i+1]=gNamax*(m[i+1]**3)*h[i+1]*(V[i+1]-ENa)
     I_L[i+1]=gL*(V[i+1]-ECl)
 
+#post processing
+sumIonCurrents = I_K+I_Na+I_L
+
 # plt.figure()
 # plt.plot(t,V[0:len(V)-1], label="membrane potential")
 # plt.xlabel("ms")
@@ -170,13 +173,20 @@ for i,time in enumerate(t):
 # plt.axhline(y=V_0,color='r',linestyle='--')
 
 fig = make_subplots(rows=2,cols=2)
-fig.add_trace(go.Line(x=t,y=V[0:len(V)-1]),row=1,col=1)
-fig.add_trace(go.Line(x=t,y=n[0:len(V)-1]),row=1,col=2)
-fig.add_trace(go.Line(x=t,y=m[0:len(V)-1]),row=1,col=2)
-fig.add_trace(go.Line(x=t,y=h[0:len(V)-1]),row=1,col=2)
-fig.add_trace(go.Line(x=t,y=I_Na[0:len(V)-1]),row=2,col=2)
-fig.add_trace(go.Line(x=t,y=I_K[0:len(V)-1]),row=2,col=2)
-fig.add_trace(go.Line(x=t,y=Iapplied[0:len(V)-1]),row=2,col=1)
+fig.add_trace(go.Scatter(x=t,y=V[0:len(V)-1], name="membrane potential"),row=1,col=1)
+
+fig.add_trace(go.Scatter(x=t,y=n[0:len(V)-1], name="n (for gK)"),row=1,col=2)
+fig.add_trace(go.Scatter(x=t,y=m[0:len(V)-1], name="m (for gNa)"),row=1,col=2)
+fig.add_trace(go.Scatter(x=t,y=h[0:len(V)-1], name="h (for gNa)"),row=1,col=2)
+
+fig.add_trace(go.Scatter(x=t,y=I_Na[0:len(V)-1], name="I_Na"),row=2,col=2)
+fig.add_trace(go.Scatter(x=t,y=I_K[0:len(V)-1], name="I_K"),row=2,col=2)
+fig.add_trace(go.Scatter(x=t,y=sumIonCurrents[0:len(V)-1],mode="lines",name="IK+INa+IL", line=dict(color="purple")),row=2,col=2)
+
+fig.add_trace(go.Scatter(x=t,y=Iapplied[0:len(V)-1],name="Applied Current (mA)"),row=2,col=1)
+
+fig.update_traces(textposition="top center")
+
 fig.show()
 
 # plt.figure()
