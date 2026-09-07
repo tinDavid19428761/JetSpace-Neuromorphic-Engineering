@@ -8,26 +8,19 @@ the code bits of neuronModelNotebook.ipynb were adapted from this script
 
 # for squid axon ahh neuron 
 
-import math
 import matplotlib.pyplot as plt
 import numpy as np
-from nernstEquation import nernst_full
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from scipy import signal
 
+from neuron_functions import *
 
 # constants
 
 #nernst potential data (exercise 1)
 T=20+273.15 #Kelvin
 Capa = 1 #mF/cm^2
-
-def nernst_full(T,z,IonIn,IonOut): # K,,Mol,Mol
-    R=8315 #mJ/(K*Mol)
-    F=96480 #C/Mol
-    E_ion=R*T/z/F*math.log(IonOut/IonIn) #mV
-    return E_ion
 
 # nernst potentials
 # using ch.2 ex.1 data
@@ -68,32 +61,6 @@ gate_n = {
 }
 
 
-#eq(2.11) Boltzmann equation
-def gate_inf(V,gate):
-    return  1/(1+np.exp((gate["Vhalf"]-V)/gate["k"])) 
-
-#eq(2.12) gaussian
-def timeconstant(V,gate):
-    return gate["Cbase"] + gate["Camp"]*np.exp((-(gate["Vmax"]-V)**2)/gate["sigma"]**2) 
-
-#eq(2.9) [gate] activation variable dynamics dn/dt
-def gate_diff(V,gate_id,gate_0):
-    return (gate_inf(V,gate_id)-gate_0)/timeconstant(V,gate_id) 
-
-# current pulser (assumes same units as time series)
-pulse_mag = 15 #mA
-pulse_period = 10
-pulse_length = 1
-pulse_delay = 5 
-
-# take a time-axis array and generate a PWM-style pulse array.
-# pulses from zero to given magnitude
-def current_pulser(magnitude,period,length,delay,timeseries):
-    frequency = 1/period
-    pwm_array = (signal.square(frequency*2*np.pi*t,duty=length/period)+1)/2*magnitude
-    return np.where(timeseries >= delay, pwm_array, 0)
-
-
 dt = 1/100 #ms
 duration = 40 #ms
 
@@ -111,18 +78,20 @@ I_L = np.zeros(range)
 
 # Determining the resting membrane potential V_rest:
 
-# Varray = np.linspace(-40,-90,40)
-# Itest = np.zeros(len(Varray))
-# for i,Vstep in enumerate(Varray):
-#     Itest[i] = -(gKmax*(gate_inf(Vstep,gate_n)**4)*(Vstep-EK))-(gNamax*(gate_inf(Vstep,gate_m)**3)*(gate_inf(Vstep,gate_h))*(Vstep-ENa))-(gLmax*(Vstep-ECl))
+Varray = np.linspace(-40,-90,40)
+Itest = np.zeros(len(Varray))
+for i,Vstep in enumerate(Varray):
+    Itest[i] = -(gKmax*(gate_inf(Vstep,gate_n)**4)*(Vstep-EK))-(gNamax*(gate_inf(Vstep,gate_m)**3)*(gate_inf(Vstep,gate_h))*(Vstep-ENa))-(gL*(Vstep-ECl))
+
+V_0 = np.interp(0,Itest,Varray)
+print(F"resting membrane potential: {V_0:.4f}")
     
 # plt.figure()
 # plt.plot(Varray,Itest, label="current flows")
 # plt.axhline(y=0,color='r',linestyle='--')
 # plt.axvline(x=-65,color='r',linestyle='--')
 # plt.show()
-
-V_0 = -65.5
+# V_0 = -65.5
 
 # intial values of iterated variables
 V[0] = V_0

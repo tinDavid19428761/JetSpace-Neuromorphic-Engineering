@@ -2,7 +2,7 @@
 
 '''validate model against figure 2.20 in 'dynamical systems in neuroscience book '''
 
-from hodgkin_huxley_model import gate_inf,timeconstant
+from neuron_functions import gate_inf,timeconstant
 import matplotlib.pyplot as plt
 import numpy as np
 
