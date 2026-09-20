@@ -141,6 +141,12 @@ sumIonCurrents = I_K+I_Na+I_L
 # plt.legend()
 # plt.axhline(y=V_0,color='r',linestyle='--')
 
+plt.figure()
+plt.plot(V[0:len(V)-1],n[0:len(V)-1], label="phase portrait")
+plt.xlabel("mV")
+plt.ylabel("gate 'n'")
+plt.legend()
+
 fig = make_subplots(rows=2,cols=2)
 fig.add_trace(go.Scatter(x=t,y=V[0:len(V)-1], name="membrane potential"),row=1,col=1)
 
