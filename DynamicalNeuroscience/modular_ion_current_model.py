@@ -24,8 +24,8 @@ from neuron_functions import *
 # where ion conductance/current is expressed as: I = [g*n*h*(V-E)]_i
 
 # parameter-table headers
-# current-name | Nernst Potential | g_max | exp (activator)^x | exp (in-activator)^y 
-# | other associated gate parameters... (null if no (in)-activator gate, or m_inf(V) assumption)
+# current-name | Nernst Potential | g_max | exp (amp)^x | exp (res)^y 
+# | other associated gate parameters... (null if no amp/res gate, or m_inf(V) assumption)
 # | V_1/2 | k | Vmax | sigma | Camp | Cbase
 
 # example: (table data can be defaults, and then edited)
